@@ -73,6 +73,9 @@ async function run() {
       if ((req, query.jobId)) {
         query.jobId = req.query.jobId;
       }
+      if (req.query.applicantId) {
+    query.applicantId = req.query.applicantId;
+  }
       const result = await applicationsCollection.find(query).toArray();
       res.send(result);
     });
@@ -97,7 +100,7 @@ async function run() {
     });
 
     app.get("/api/companies", async (req, res) => {
-      const result = await companyCollection.find().skip(1).toArray();
+      const result = await companyCollection.find().skip(13).toArray();
       res.send(result);
     });
 
@@ -121,10 +124,27 @@ async function run() {
       res.send(result);
     });
 
+    //status update er jnno
+    // app.patch('/api/companies/:id', async(req,res)=>{
+    //   const id = req.params.id;
+    //   const updatedCompany = req.body
+    //   const filter = { _id: new ObjectId(id)}
+    //   const updatedDoc = {
+    //     $set: {
+    //       status: updatedCompany.status
+    //     }
+    //   }
+
+    //   const result = await companyCollection.updateOne(filter,updatedDoc)
+    //   res.send(result)
+    // })
+
+
+
     app.patch("/api/companies/:id", async (req, res) => {
       const id = req.params.id;
       const updatedData = req.body;
-      delete updatedData._id; // _id update kora jay na
+      delete updatedData._id; 
 
       const result = await companyCollection.updateOne(
         { _id: new ObjectId(id) },
