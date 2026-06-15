@@ -99,9 +99,23 @@ async function run() {
       res.send(result);
     });
 
+    // app.get("/api/companies", async (req, res) => {
+    //   const result = await companyCollection.find().skip(13).toArray();
+    //   res.send(result);
+    // });
+
+    //inefficient way to join collection
     app.get("/api/companies", async (req, res) => {
-      const result = await companyCollection.find().skip(13).toArray();
-      res.send(result);
+      const companies = await companyCollection.find().skip(13).toArray();
+
+      for(const company of companies){
+        const filter = {
+          companyId: company._id.toString()
+        }
+        const jobCount = await jobCollection.countDocuments(filter)
+        company.jobsCount = jobCount
+      }
+      res.send(companies);
     });
 
     app.get("/api/my/companies", async (req, res) => {
@@ -123,23 +137,6 @@ async function run() {
       const result = await companyCollection.insertOne(newCompany);
       res.send(result);
     });
-
-    //status update er jnno
-    // app.patch('/api/companies/:id', async(req,res)=>{
-    //   const id = req.params.id;
-    //   const updatedCompany = req.body
-    //   const filter = { _id: new ObjectId(id)}
-    //   const updatedDoc = {
-    //     $set: {
-    //       status: updatedCompany.status
-    //     }
-    //   }
-
-    //   const result = await companyCollection.updateOne(filter,updatedDoc)
-    //   res.send(result)
-    // })
-
-
 
     app.patch("/api/companies/:id", async (req, res) => {
       const id = req.params.id;
