@@ -14,6 +14,25 @@ app.get("/", (req, res) => {
   res.send("hello world");
 });
 
+const logger = async(req,res,next) =>{
+  console.log('logger middleware logged', req.params);
+  next()
+}
+
+const verifyToken = (req,res,next) =>{
+  console.log('headers', req.headers);
+  const authHeader = req.headers?.authorization
+  if(!authHeader){
+    return res.status(401).send({message: 'unauthorized access'})
+  }
+
+  const token = authHeader.split(' ')[1]
+  if(!token){
+    return res.status(401).send({message: 'unauthorized access'})
+  }
+  next()
+}
+
 const uri = process.env.MONGODB_URI;
 
 const client = new MongoClient(uri, {
@@ -105,7 +124,7 @@ async function run() {
     // });
 
     //inefficient way to join collection
-    app.get("/api/companies", async (req, res) => {
+    app.get("/api/companies", verifyToken, async (req, res) => {
       const companies = await companyCollection.find().skip(13).toArray();
 
       for(const company of companies){
@@ -138,7 +157,7 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/api/companies/:id", async (req, res) => {
+    app.patch("/api/companies/:id", logger, verifyToken, async (req, res) => {
       const id = req.params.id;
       const updatedData = req.body;
       delete updatedData._id; 
