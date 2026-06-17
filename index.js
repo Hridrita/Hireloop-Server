@@ -105,10 +105,10 @@ async function run() {
 
 
 
-    app.get("/api/users",verifyToken, verifyAdmin, async (req, res) => {
-      const result = await userCollection.find().toArray();
-      res.send(result);
-    });
+    // app.get("/api/users",verifyToken, verifyAdmin, async (req, res) => {
+    //   const result = await userCollection.find().toArray();
+    //   res.send(result);
+    // });
 
     app.get("/api/jobs", async (req, res) => {
       const query = {};
@@ -177,7 +177,7 @@ async function run() {
     // });
 
     //inefficient way to join collection
-    app.get("/api/companies", async (req, res) => {
+    app.get("/api/companies", verifyToken, verifyAdmin, async (req, res) => {
       const companies = await companyCollection.find().skip(13).toArray();
 
       for (const company of companies) {
